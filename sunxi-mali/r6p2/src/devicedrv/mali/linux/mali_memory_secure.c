@@ -131,7 +131,11 @@ int mali_mem_secure_cpu_map(mali_mem_backend *mem_bkend, struct vm_area_struct *
 		MALI_DEBUG_ASSERT(0 == size % _MALI_OSK_MALI_PAGE_SIZE);
 
 		for (j = 0; j < size / _MALI_OSK_MALI_PAGE_SIZE; j++) {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 0)
 			ret = vm_insert_pfn(vma, addr, PFN_DOWN(phys));
+#else
+			ret = vmf_insert_pfn(vma, addr, PFN_DOWN(phys));
+#endif
 
 			if (unlikely(0 != ret)) {
 				return -EFAULT;
